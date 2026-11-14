@@ -1,0 +1,94 @@
+import { createAssets } from './core/assets';
+import { createAudio } from './core/audio';
+import { createGameState } from './game/state';
+import { createInput } from './input/input';
+import { music, sounds, sprites, voice } from './manifest';
+import { createCutsceneScene } from './scenes/cutscene';
+import { createFightScene } from './scenes/fight';
+import { createOceanScene } from './scenes/ocean';
+import { createResultScene } from './scenes/result';
+import { createShopScene } from './scenes/shop';
+import type { Game, Scene, SceneFactory, SceneId, SceneParams } from './types';
+
+const WIDTH = 960;
+const HEIGHT = 540;
+const STEP = 1 / 60;
+
+const canvas = document.getElementById('game') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d')!;
+
+function fit(): void {
+  const s = Math.min(window.innerWidth / WIDTH, window.innerHeight / HEIGHT);
+  canvas.style.width = `${Math.floor(WIDTH * s)}px`;
+  canvas.style.height = `${Math.floor(HEIGHT * s)}px`;
+}
+window.addEventListener('resize', fit);
+fit();
+
+const factories: { [K in SceneId]: SceneFactory<K> } = {
+  ocean: createOceanScene,
+  cutscene: createCutsceneScene,
+  fight: createFightScene,
+  result: createResultScene,
+  shop: createShopScene,
+};
+
+let scene: Scene | null = null;
+let time = 0;
+
+const game: Game = {
+  width: WIDTH,
+  height: HEIGHT,
+  get time() { return time; },
+  input: createInput(),
+  assets: createAssets(sprites),
+  audio: createAudio(sounds, music, voice),
+  state: createGameState(window.localStorage),
+  go<K extends SceneId>(id: K, params: SceneParams[K]) {
+    scene?.exit?.();
+    scene = (factories[id] as SceneFactory<K>)(game, params);
+    scene.enter?.();
+  },
+};
+
+// Browsers block audio until the first user gesture.
+for (const ev of ['keydown', 'pointerdown', 'gamepadconnected'] as const) {
+  window.addEventListener(ev, () => game.audio.unlock());
+}
+
+/** Dev shortcut: ?scene=fight&fish=shark&tier=0 jumps straight to a scene. */
+function start(): void {
+  const q = new URLSearchParams(location.search);
+  const id = q.get('scene') as SceneId | null;
+  const f = game.state.makeFish(q.get('fish') ?? 'sardine', Number(q.get('tier') ?? 0));
+  if (id === 'fight' || id === 'cutscene') game.go(id, { fish: f });
+  else if (id === 'result') game.go('result', { fish: f, outcome: (q.get('outcome') as 'win') ?? 'win', goldEarned: f.gold });
+  else if (id === 'shop') game.go('shop', undefined);
+  else game.go('ocean', undefined);
+}
+
+let last = performance.now();
+let acc = 0;
+function frame(now: number): void {
+  acc += Math.min(0.1, (now - last) / 1000);
+  last = now;
+  while (acc >= STEP) {
+    game.input.update();
+    if (game.input.anyPressed()) game.audio.unlock();
+    scene?.update(STEP);
+    time += STEP;
+    acc -= STEP;
+  }
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+  scene?.render(ctx);
+  requestAnimationFrame(frame);
+}
+
+game.assets.load().then(() => {
+  start();
+  requestAnimationFrame(frame);
+});
+
+// Handy in the browser console while tuning.
+(window as unknown as { game: Game }).game = game;
