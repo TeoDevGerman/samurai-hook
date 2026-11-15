@@ -169,9 +169,13 @@ Last updated: 2026-11-15 (jump, crouch and dodge-only specials, branch `feat/jum
   still wins every fish at every damage level. In the browser (scripted
   keys): crouch under pufferfish spines, jump over a squid ink wave, jump
   over the swordfish charge, the JUMP! tell and red band; no console errors.
-- **Not verified:** a human playing it; any gamepad (a diagonal stick tilt
-  may jump or crouch by accident); projectiles drawn over real ink splats
-  (the draw order puts them on top, but no screenshot caught both at once).
+- **Not verified:** a human playing it; any real gamepad (the stick now
+  jumps or crouches only on a clearly vertical tilt, 56 degrees or steeper
+  from horizontal and held down to 50, so a diagonal walk does neither:
+  `stickVertical` in `src/input/core.ts`. This rests on unit tests with a
+  fake pad; the angles may need tuning by feel); projectiles drawn over real
+  ink splats (the draw order puts them on top, but no screenshot caught both
+  at once).
 
 README and store text (session 2, 2026-11-15): README.md was rewritten in a
 plainer voice around one hook, "nobody reels in a fish without a fight"
