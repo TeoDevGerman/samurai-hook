@@ -80,6 +80,60 @@ Last updated: 2026-11-15 (jump, crouch and dodge-only specials, branch `feat/jum
 
 ## In progress
 
+### Mobile browser (2026-11-15, for team review)
+
+- **Decisions (owner, 2026-11-15; the team decided to support mobile browsers):**
+  mobile BROWSER only (no manifest, service worker or wrapper app); LANDSCAPE
+  ONLY; steering the hook is by dragging a finger, everything else by
+  on-screen buttons; tapping the canvas never means confirm (confirm also
+  jumps and reels in, so stray taps would misfire). After the first phone
+  test (iPhone, Chrome): touching the water should cast without CONFIRM, and
+  steering the hook felt laggy.
+- **How it works:** `InputCore` has a third source: `touchDown/touchUp(action)`
+  (same held, edge and tap-latch rules as keys) and `setTouchAxis(x, y)` (added
+  to keys/stick in `moveX/moveY`, clamped). `Device` gained `'touch'`;
+  `clearKeys()` also releases touch. `src/input/touch.ts` builds a DOM overlay
+  (pad, QUICK / HEAVY / BLOCK / CONFIRM, SHOP) with Pointer Events tracked per
+  `pointerId`; the pad hit-tests with pointer capture so sliding changes
+  direction (diagonals allowed). A finger down anywhere that is not a button:
+  - **casts** if the ocean is idle (`input.tapped()`, its own signal, read only
+    by the idle ocean; never `confirm`, so no jump in a fight or reel-in while
+    sinking);
+  - **steers the hook 1:1** while fishing: finger travel converted to game px
+    (`input.dragDX()`), capped at `ocean.hook.touchSteerMaxSpeed` (1200 px/s).
+    The first version used a joystick capped at `steerSpeed` (260 px/s), which
+    trailed far behind a thumb and read as lag;
+  - is also a small floating stick (8 px dead zone, full at 30 px) for walking
+    in fights and braking or sinking faster while fishing.
+  - **quick swipes** (40 px within 180 ms, `swipeDir`, only fights act on
+    them): left/right dash, up jumps (one press of `up`), down crouches
+    (holds `down` until the finger lifts). Rhaveen: all controls should work
+    by touch, not only by buttons.
+  The buttons follow the scene (`setScene`, called from `game.go`): fights show
+  QUICK, HEAVY, BLOCK and DASH, with no CONFIRM or SHOP (Rhaveen: a CONFIRM
+  that makes him jump "makes no sense"); fishing shows REEL IN and SHOP; the
+  shop BUY and BACK; cutscene and result OK. DASH dashes the way the pad or
+  drag points, or away from the fish with no direction (`input.dashDir()`;
+  the fight turns it into the existing defend-plus-direction dash).
+  **Walking by drag is 1.5x faster** than keys or pad
+  (`fight.samurai.touchWalkScale`, owner's choice, so phones are a little
+  easier); bots never set it, so the balance snapshot is unchanged.
+  The phone hint text is in `text.touch` in the manifest; the device starts as
+  `touch` when the overlay is on, so the hint shows before the first touch. The overlay exists only when
+  `(pointer: coarse)` matches or the URL has `?touch=1`; desktop is unchanged.
+  The prompt bar is hidden while `device === 'touch'`.
+- **Portrait:** a full-screen CSS message covers the page, and `main.ts` skips
+  steps and render while `blocked()` (resets the clock each frame, so no dt
+  jump on rotating back). Pad/buttons/drag are released on rotation, blur and
+  tab hide. Music keeps playing in portrait (not paused).
+- **Not verified:** a real phone. Multi-touch (hold left while pressing QUICK),
+  iOS Safari quirks (audio unlock on first touch, address-bar and
+  `visualViewport` resize, notch safe areas), thumb comfort and button size,
+  and performance. Only synthetic pointer events in a desktop browser.
+- **Lag diagnosis:** `?debug=perf` shows the build's short commit, fps, the
+  worst frame of the last second and the delay from a touch to the game step
+  that used it. Ask testers to open the preview with it if anything feels slow.
+
 ### Jump, crouch and dodge-only specials (branch `feat/jump-crouch-dodge`, for team review)
 
 - **Controls:** in the fight, W / up / Space (pad: A or up) jumps, S / down
@@ -204,6 +258,8 @@ https://github.com/yurtemre7/samurai-hook.git`. Reload any open game tab.
        the browser" for the `html5` channel upload, and remove any old
        manually uploaded zip so players get the automated build.
     4. Re-run the workflow from the Actions tab ("Run workflow").
+    5. For phones: the itch.io embed options may need "Mobile friendly"
+       ticked and the orientation set to landscape. Unverified.
 
 ## Pending (in priority order)
 
