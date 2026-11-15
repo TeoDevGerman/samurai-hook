@@ -197,8 +197,8 @@ block merging.
 - Jumping above `size x clearScale` also dodges a biter's lunge.
 - Striking the fish during a special's tell, charge or volley lands (it
   cannot slip then), stuns it and still costs the special its full cooldown.
-- `docs/DESIGN.md` (4-button duel, "slippery fish never attack") is still
-  not updated for this; it should be.
+- `docs/DESIGN.md` now describes jump, crouch and the specials (sections
+  3.4, 3.5 and 3.7).
 - **This reverses a team decision:** "slippery fish stay harmless"
   (Rhaveen, 2026-11-14). The eel, pufferfish and squid can now hurt the
   samurai, so their fights show his health bar. The test "slippery fish never
@@ -347,7 +347,7 @@ https://github.com/yurtemre7/samurai-hook.git`. Reload any open game tab.
    and reel-speed upgrades, parry, a boss, a bestiary. **Electric eel**
    (suggested by Rhaveen, 2026-11-14): the eel charges up with a visible
    crackle, then shocks a circle around itself; back off or dash to avoid it,
-   blocking does not help. A version is on branch `feat/jump-crouch-dodge`
+   blocking does not help. A version is on `main` since PR #36
    (a floor shock wave to jump over, not a circle).
 
 Bundled kanji font (session 2): the kanji now use Kaisei Tokumin Bold (SIL
@@ -432,6 +432,7 @@ Session 2 decisions by Rhaveen (2026-11-14):
 - Slippery fish stay harmless, as designed. The pufferfish keeps its stun and
   bounce with no damage; the eel stays slippery (electric eel is a later
   idea); the squid sprite stays as it is.
+  (Reversed by PR #36: the eel, pufferfish and squid now have specials.)
 - The anglerfish's lure should glow through the darkness (visual only).
 - Finish the placeholder fish first; redraw the whole roster later.
 - The fight music stays. Only the announcer voice is replaced (see

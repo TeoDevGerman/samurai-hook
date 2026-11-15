@@ -1,6 +1,8 @@
 # SamuraiHook: design and build plan
 
-Status: **awaiting team approval** (2026-11-14). No game code exists yet.
+Status: **approved on 2026-11-14 and built**; the game is on `main`. This is
+the original plan, with later design changes noted in sections 1, 3.4, 3.5 and
+3.7. HANDOVER.md has the current state; `src/manifest.ts` has current numbers.
 
 ## 1. What we are building and why
 
@@ -26,7 +28,7 @@ first playable build.
 
 | Topic | Decision |
 |---|---|
-| Fight controls | 4-button duel: move, quick slash, heavy slash, defend (hold = block, tap + direction = dash-dodge) |
+| Fight controls | 4-button duel: move, quick slash, heavy slash, defend (hold = block, tap + direction = dash-dodge). Jump and crouch were added later (PR #36), see 3.4 |
 | Art | CC0 pixel art fetched online; code-drawn placeholder wherever a licence cannot be confirmed |
 | Roster | 8 to 10 fish (plan: 9) |
 | Shop | 3 endless tracks only: damage, max depth, gold bonus |
@@ -85,10 +87,12 @@ Samurai moves:
 | Walk | left / right |
 | Quick slash | fast, short reach, low damage |
 | Heavy slash | 0.45 s wind-up, long reach, triple damage |
-| Block | hold defend: takes 20% damage, cannot move |
+| Block | hold defend: takes 35% damage, cannot move |
 | Dash-dodge | tap defend with a direction: short dash, brief invulnerability |
+| Jump | ground only, about 0.7 s in the air with air steering; no slashing, blocking or dashing in the air |
+| Crouch | hold down: halves the samurai's height |
 
-Slippery fish never attack. Each has a **slip**: when a strike would land,
+Slippery fish have no bite. Each has a **slip**: when a strike would land,
 the fish can dart away (often over the samurai's head) and "SLIPPED!"
 appears. After a slip the fish is briefly out of slips (its recovery
 window, shown by a sweat-drop and a slower wobble). The skill is to bait a
@@ -97,7 +101,15 @@ driven by a visible state, not hidden dice, so a miss always has a reason.
 
 Biters do all of that and attack. Every attack has a wind-up tell (flash
 and "!"). Piranha: 0.3 s tell, weak, frequent. Shark: 0.9 s tell, very
-heavy. The samurai has a health bar only in these fights.
+heavy. The samurai has a health bar in every fight where the fish can hurt
+him (a bite or a special).
+
+Specials (added in PR #36) are dodge-only attacks: block and dash
+invulnerability do not help. The fish backs off, flashes purple and shows
+JUMP! or DUCK! first. Eel: a shock wave along the floor (jump). Pufferfish:
+two spines at head height (duck). Swordfish: a low charge across the whole
+deck (jump), then a long open window. Shark: a tail-slap wave along the
+floor (jump). Squid: ink shots high, low, high (duck, jump, duck).
 
 Outcomes: fish health zero = "K.O.!", the fish becomes nigiri and is sold.
 Timer zero = "TIME! IT WAS... TOO SLIPPERY." Samurai health zero = "YOU
@@ -120,7 +132,9 @@ Samurai base: quick slash 6, heavy slash 18, health 100.
 | 9 | Giant Squid | slippery | 140-170 | 550 | 40 s | 600 | ink splats hide part of the screen |
 
 Six slippery, three biters. All nine share one behaviour model driven by
-config numbers; only pufferfish, anglerfish and squid have a gimmick.
+config numbers; only pufferfish, anglerfish and squid have a gimmick, and
+five fish have a special (see 3.4). The table shows the starting values;
+the current ones are in `src/manifest.ts`.
 
 ### 3.6 Shop and economy
 
@@ -139,6 +153,8 @@ gold by 2.5, so the loop never runs out. All numbers live in the manifest.
 |---|---|---|
 | Move / steer | A D or arrow keys (W S or up/down in ocean) | left stick or d-pad |
 | Confirm / drop hook / skip | Space or Enter | A (bottom) |
+| Fight: jump | W, up arrow or Space | A, or up on stick / d-pad |
+| Fight: crouch (hold) | S or down arrow | down on stick / d-pad |
 | Quick slash | J | X (left) |
 | Heavy slash | K | Y (top) |
 | Defend | L or Shift | B (right) or RB |
@@ -161,6 +177,8 @@ used last. No settings menu.
    per-frame collision and animation, where canvas is simpler.
 
 ## 5. Architecture
+
+This was the planned layout. The layout as built is in README.md ("Code layout").
 
 ```
 index.html
