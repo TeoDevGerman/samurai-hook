@@ -1,6 +1,6 @@
 # Credits
 
-All third-party assets are CC0 1.0 (public domain) except `fish/pufferfish.png` (CC-BY 3.0, credit below) and the bundled kanji font (SIL OFL 1.1, with its licence text next to it). Licences were read on each
+All third-party assets are CC0 1.0 (public domain) except: `fish/pufferfish.png` (CC-BY 3.0), the bundled kanji font (SIL OFL 1.1, with its licence text next to it) and the announcer's "Fight" clip `voice/alba-fx-fight.wav` (CC-BY 4.0). Credits for the CC-BY assets are in the table below. Licences were read on each
 asset's own OpenGameArt page (the "License(s)" field) on 2026-11-14; the Kenney
 RPG sounds pack also ships a `license.txt` stating CC0. Credit is not required
 but given here anyway. Sprites were cropped, scaled and cut into strips; audio
@@ -20,6 +20,8 @@ was copied unchanged except `music/ocean.mp3` (trimmed to 60 s, fades, MP3 64 kb
 | `public/assets/sfx/splash.ogg` (splash_02) | Water splash | https://opengameart.org/content/40-cc0-water-splash-slime-sfx | rubberduck | CC0 | 2026-11-14 |
 | `public/assets/sfx/coin.wav` (coin3) | Coin | https://opengameart.org/content/10-8bit-coin-sounds | Luke.RUSTLTD | CC0 | 2026-11-14 |
 | `public/assets/sfx/ui_confirm.ogg` (metalClick) | Metal click | https://opengameart.org/content/50-rpg-sound-effects | Kenney (kenney.nl) | CC0 | 2026-11-14 |
+| `public/assets/voice/win.ogg` (you_win), `perfect.ogg` (flawless_victory), `timeout.ogg` (time), `ko.ogg` (you_lose), `round.ogg` (ready; generic, used from round 6), `round1.ogg` to `round5.ogg` (round_1 to round_5) | Fight announcer lines, copied unchanged (.ogg) | https://opengameart.org/content/voiceover-pack-fighter-40-taunts (also https://kenney.nl/assets/voiceover-pack-fighter) | Kenney Vleugels (kenney.nl) | CC0 (OpenGameArt "License(s): CC0"; the zip's License.txt says CC0 1.0) | 2026-11-14 |
+| `public/assets/voice/alba-fx-fight.wav` | "Fight" from "Voice Pack │ Fighting Game Announcer" (FX version, the author's own processed take). The embedded cover-art metadata block was removed; the audio is otherwise unchanged, and it is processed at playback. Credit required: "Alba MacKenna". | https://opengameart.org/content/voice-pack%E2%94%82fighting-game-announcer | Alba MacKenna | CC-BY 4.0 (OpenGameArt "License(s): CC-BY 4.0"; the archive's readme says CC BY 4.0) | 2026-11-15 |
 | `public/assets/music/fight.ogg` (8BitBattleLoop) | Fight loop | https://opengameart.org/content/8-bit-battle-loop | Wolfgang_ | CC0 | 2026-11-14 |
 | `public/assets/music/ocean.mp3` (first 60 s of hot_spring_town.ogg) | Calm ocean track | https://opengameart.org/content/hot-springs-town | Kistol | CC0 | 2026-11-14 |
 | `public/assets/fonts/kaisei-tokumin.woff2` (+ `OFL-kaiseitokumin.txt`) | Kaisei Tokumin Bold, subset to the game's kanji and kana (WOFF2). The kanji font | https://github.com/google/fonts/tree/main/ofl/kaiseitokumin (source: https://github.com/Font-Kai/Kaisei) | The Kaisei Project Authors | SIL OFL 1.1 | 2026-11-15 |
@@ -47,6 +49,9 @@ Sprites
 
 Sounds (synthesised fallbacks stay in use)
 - `bite`, `uiDeny`, `lose`, `hooked`: no confident match found, and files could not be auditioned. Not guessed.
+
+Announcer
+- Every line except "Fight" is the Kenney Fighter pack (one voice, no "K.O." clip, so the win line uses "you win"); "Fight" is Alba MacKenna's clip. All are processed at playback (deeper pitch, EQ; extra distortion and echo for "Fight"). There is no "Upgrade!" clip: that line (and any line whose clip fails to load) is spoken by browser speech synthesis. Fish names are not recorded; whether synthesis speaks them after "Round N" is the `voice.speakFishName` switch (off). Nobody has listened to the clips; line choice is by file name.
 
 Notes
 - Fish art faces left; samurai art faces right (`facing: 'right'`); frames are 456x173 on screen, body about 125 px tall.

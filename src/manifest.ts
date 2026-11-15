@@ -3,6 +3,7 @@
 // See README.md ("Add a fish", "Swap an asset").
 
 import type { FishDef, SoundDef, SpriteDef, UpgradeDef } from './types';
+import type { FxChoice, VoiceFx } from './core/announcer';
 
 // ---------- Fonts ----------
 // Kanji use a bundled font (subset to the characters the game draws) so they
@@ -88,8 +89,53 @@ export const music: Record<string, { src: string | null; volume: number }> = {
   fight: { src: 'assets/music/fight.ogg', volume: 0.4 },
 };
 
-/** Spoken announcer (browser speech synthesis). */
-export const voice = { enabled: true, rate: 1.15, pitch: 0.6, volume: 1 };
+/**
+ * Announcer. Recorded clips are played when present and loaded; otherwise the
+ * line in `text.announce` is spoken by browser speech synthesis (rate / pitch /
+ * volume below), so the game is never silent. Round clips: the game looks up
+ * `round<N>` first, then the generic `round`, then speech. No clip exists for
+ * `buy` ("Upgrade!"), which stays synthesised. Clips are credited in
+ * CREDITS.md.
+ *
+ * Clips are played through a Web Audio effect chain; see `VoiceFx` in
+ * src/core/announcer.ts for every setting. `preset` is the treatment for all
+ * lines; `linePresets` overrides it per line key (fight, win, perfect,
+ * timeout, ko, round), with either a preset name or inline fx values.
+ * `clean` is neutral: the clip is played unprocessed.
+ * Shipped choice (owner, 2026-11-15): Kenney "Voiceover Pack: Fighter" (CC0)
+ * with `deep` for every line, except "Fight", which is Alba MacKenna's own FX
+ * take (CC-BY 4.0) with `demonPlus`.
+ */
+export const voice = {
+  enabled: true, rate: 1.15, pitch: 0.6, volume: 1,
+  clips: {
+    fight: 'assets/voice/alba-fx-fight.wav', // Alba MacKenna, CC-BY 4.0
+    win: 'assets/voice/win.ogg',
+    perfect: 'assets/voice/perfect.ogg',
+    timeout: 'assets/voice/timeout.ogg',
+    ko: 'assets/voice/ko.ogg',
+    round: 'assets/voice/round.ogg',       // generic, used from round 6 on
+    round1: 'assets/voice/round1.ogg',
+    round2: 'assets/voice/round2.ogg',
+    round3: 'assets/voice/round3.ogg',
+    round4: 'assets/voice/round4.ogg',
+    round5: 'assets/voice/round5.ogg',
+  } as Record<string, string>,
+  /** After a recorded "Round N" clip, also speak the fish name with the
+   *  synthesised voice? false: the name is on screen anyway. */
+  speakFishName: false,
+  /** Effect presets for recorded clips. */
+  presets: {
+    clean: {},
+    deep: { rate: 0.85, lowBoost: 8, highCut: 9000 },
+    // Shouted, distorted, short slap echo: made for the "Fight" line.
+    demonPlus: { rate: 0.78, lowBoost: 10, highCut: 6000, drive: 0.75, reverb: 0.3, reverbSeconds: 1.6, echo: 0.22, echoSeconds: 0.12, gain: 4 },
+  } as Record<string, Partial<VoiceFx>>,
+  /** Treatment for every line without an override. */
+  preset: 'deep' as FxChoice,
+  /** Per-line overrides. */
+  linePresets: { fight: 'demonPlus' } as Record<string, FxChoice>,
+};
 
 // ---------- Fish ----------
 // Depth bands are for tier 0. Deeper than `tiers.depth`, the roster repeats.
