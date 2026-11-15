@@ -31,9 +31,9 @@ const SAMURAI_SHOULDER = 80; // px above the floor where the sword arc is centre
 
 const SAM_SPRITE: Record<FightState['samurai']['move'], string> = {
   idle: 'samuraiIdle', walk: 'samuraiWalk', dash: 'samuraiWalk', quick: 'samuraiQuick',
-  heavy: 'samuraiHeavy', block: 'samuraiBlock', hurt: 'samuraiHurt',
-  // No jump or crouch art: existing frames, bent by samuraiTransform.
-  jump: 'samuraiWalk', crouch: 'samuraiIdle',
+  heavy: 'samuraiHeavy', block: 'samuraiBlock', hurt: 'samuraiHurt', crouch: 'samuraiCrouch',
+  // No jump art: walk frames, bent by samuraiTransform.
+  jump: 'samuraiWalk',
 };
 const JUMP_AIRTIME = (2 * F.samurai.jump.speed) / F.samurai.jump.gravity;
 
@@ -161,7 +161,7 @@ function samuraiTransform(s: FightState['samurai'], wt: number) {
       sx = p < 0.2 ? 0.94 : 1.05;
       break;
     }
-    case 'crouch': sy = F.samurai.crouchHeight / F.samurai.standHeight + 0.08; sx = 1.12; break;
+    case 'crouch': break; // the crouch art is already low and breathes on its own
     case 'quick':
       if (s.stage === 'startup') { rot = -s.facing * 0.08; }
       else if (s.stage === 'active') { rot = s.facing * 0.16; sx = 1.1; }
